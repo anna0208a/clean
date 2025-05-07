@@ -20,16 +20,31 @@ const FinalStep: React.FC<FinalStepProps> = ({
       <YStack gap={"$5"}>
         <XStack gap={"$5"}>
           <Button onPress={onPrevious}>{`<`}上一步</Button>
-          <Button theme="blue" onPress={() => {
-  // 呼叫後端產生 Excel
-  onExport();
-  // 直接開啟下載網址
-  setTimeout(() => {
-    window.location.href = 'http://localhost:3001/api/download';
-  }, 500); // 等待 0.5 秒確保檔案已生成
-}}>
+          <Button
+  theme="blue"
+  onPress={async () => {
+    try {
+      // 呼叫後端產生 Excel（等待完成）
+      const response = await fetch('http://localhost:3000/api/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: extractedData }) // 若不需傳 data 可略過
+      });
+
+      if (response.ok) {
+        // 自動觸發下載
+        window.location.href = 'http://localhost:3000/api/download';
+      } else {
+        alert("產生 Excel 失敗");
+      }
+    } catch (error) {
+      alert("無法連線到後端！");
+    }
+  }}
+>
   匯出並下載 Excel
 </Button>
+
 
         </XStack>
         <Button onPress={onRestart}>重新開始</Button>
