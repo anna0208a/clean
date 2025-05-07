@@ -5,12 +5,14 @@ interface FinalStepProps {
   onExport: () => void;
   onRestart: () => void;
   onPrevious: () => void;
+  extractedData: any;
 }
 
 const FinalStep: React.FC<FinalStepProps> = ({
   onExport,
   onRestart,
   onPrevious,
+  extractedData
 }) => {
   return (
     <YStack gap={"$5"}>

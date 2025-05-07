@@ -120,6 +120,7 @@ const handleInputChange = (rowIndex: number, field: string, value: string) => {
             onExport={handleExportExcel}
             onRestart={handleRestart}
             onPrevious={handlePreviousFromFinal}
+            extractedData={extractedData}
           />
         )}
       </YStack>
