@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",                // 要加上這行！
+    "paths": {
+      "@/*": ["src/*"],
+      "@page/*": ["src/page/*"],
+      "@img/*": ["src/assets/img/*"]
+    },
+  },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
