@@ -5,8 +5,9 @@ import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
+import ExcelJS from "exceljs";
 import { uploadPDF } from './0328/pcrver.js';
+import { generateExcel } from './0328/pcrver.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,6 +17,10 @@ const upload = multer({ dest: 'uploads/' });
 
 app.use(cors());
 app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173', // ✅ 允許你的前端網頁訪問
+}));
+
 
 app.post('/api/analyze', upload.single('pdf'), async (req, res) => {
   try {
@@ -56,12 +61,25 @@ app.post('/api/analyze', upload.single('pdf'), async (req, res) => {
     res.status(500).json({ error: '分析失敗' });
   }
 });
+app.post('/api/export', async (req, res) => {
+  try {
+    const data = req.body.data; // 前端送來的資料
+    console.log("📦 收到 Excel 資料：", data); // ✅ 請保留這行
+    await generateExcel(data); // 傳進去生成 Excel
+    res.status(200).json({ message: 'Excel 已生成' });
+  } catch (err) {
+    console.error("❌ 產生 Excel 錯誤：", err);
+    res.status(500).json({ error: 'Excel 產生失敗' });
+  }
+});
+
+
 app.get('/api/download', (req, res) => {
   const file = path.join(__dirname, 'Carbon_Footprint_Report.xlsx');
   res.download(file);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
