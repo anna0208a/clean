@@ -1,3 +1,4 @@
+
 import { ExtractedData } from "@/App";
 import { YStack, XStack, Button, Input, Text } from "tamagui";
 
@@ -44,6 +45,6 @@ const ManualInputStep: React.FC<ManualInputStepProps> = ({
       </form>
     </YStack>
   );
-};
+}; 
 
 export default ManualInputStep;

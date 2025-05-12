@@ -24,7 +24,8 @@ export const computeProgress = (
   });
 
   return (filled / missingFields.length) * 100;
-};
+}; 
+
 
 
 

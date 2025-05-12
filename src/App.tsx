@@ -100,6 +100,7 @@ const handleInputChange = (rowIndex: number, field: string, value: string) => {
         h="100vh"
         alignItems="center"
         justifyContent="center"
+        overflow="auto" // ✅ 加上滾動
       >
         {/* 全局進度顯示：每個步驟上方皆顯示目前欄位填入進度 */}
         <ProgressDisplay progress={progress} />
