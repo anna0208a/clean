@@ -7,25 +7,26 @@ export const REQUIRED_FIELDS: string[] = ["欄位A", "欄位B", "欄位C", "欄�
  */
 export const computeProgress = (
   extractedData: Record<string, string>[],
-  manualData: Record<number, Record<string, string>>
+  manualData: Record<number, Record<string, string>>,
+  missingFields: { rowIndex: number; field: string }[]
 ): number => {
-  let totalFields = 0;
-  let filledFields = 0;
+  if (!extractedData.length && !missingFields.length) return 0; // 🧠 初始狀態 → 顯示 0%
 
-  extractedData.forEach((row, rowIndex) => {
-    REQUIRED_FIELDS.forEach((field) => {
-      totalFields++;
-      const value =
-        row[field]?.trim() ||
-        manualData?.[rowIndex]?.[field]?.trim() || "";
-      if (value !== "") {
-        filledFields++;
-      }
-    });
+  if (!missingFields.length) return 100;
+
+  let filled = 0;
+  missingFields.forEach(({ rowIndex, field }) => {
+    const auto = extractedData?.[rowIndex]?.[field];
+    const manual = manualData?.[rowIndex]?.[field];
+    if ((auto && auto.trim()) || (manual && manual.trim())) {
+      filled++;
+    }
   });
 
-  return (filledFields / totalFields) * 100;
+  return (filled / missingFields.length) * 100;
 };
+
+
 
 
 /**

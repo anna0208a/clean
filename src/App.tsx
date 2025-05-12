@@ -28,7 +28,7 @@ const App: React.FC = () => {
 
 
   // 使用 service 模組計算進度
-  const progress = computeProgress(extractedData, manualData);
+  const progress = computeProgress(extractedData, manualData, missingFields);
 
   // 上傳步驟完成後回調：更新提取結果及缺少欄位，並前往手動補充
   const handleExtractionComplete = (
