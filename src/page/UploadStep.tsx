@@ -67,16 +67,14 @@ const UploadStep: React.FC<UploadStepProps> = ({ onExtractionComplete }) => {
       <XStack gap="$3">
         <Button onPress={handleExtraction}>上傳並分析</Button>
         <Button
-          onPress={() => {
-            onExtractionComplete([], REQUIRED_FIELDS.map(field => ({
-              rowIndex: 0,
-              field,
-            })));
-          }}
-          
-        >
-          略過上傳
-        </Button>
+  onPress={() => {
+    // 直接跳到 Step 3 並初始化空資料（由 App.tsx 根據空資料進入 step 3）
+    onExtractionComplete([], []); // extracted = [], missing = []
+  }}
+>
+  略過上傳
+</Button>
+
       </XStack>
     </YStack>
   );
