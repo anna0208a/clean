@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/* import React, { useState } from "react";
 import { TamaguiProvider } from "@tamagui/core";
 import config from "./tamagui.config"; // your configuration
 import "./App.css";
@@ -102,7 +102,8 @@ const handleInputChange = (rowIndex: number, field: string, value: string) => {
         justifyContent="center"
         overflow="auto" // ✅ 加上滾動
       >
-        {/* 全局進度顯示：每個步驟上方皆顯示目前欄位填入進度 */}
+        {//全局進度顯示：每個步驟上方皆顯示目前欄位填入進度 
+        }
         <ProgressDisplay progress={progress} />
         {step === 1 && (
           <UploadStep onExtractionComplete={handleExtractionComplete} />
@@ -125,6 +126,114 @@ const handleInputChange = (rowIndex: number, field: string, value: string) => {
           />
         )}
       </YStack>
+    </TamaguiProvider>
+  );
+};
+
+export default App; */
+import React, { useState } from "react";
+import { TamaguiProvider, XStack, YStack, Text, Separator } from "tamagui";
+import config from "./tamagui.config";
+import "./App.css";
+import UploadStep from "./page/UploadStep";
+import ManualInputStep from "./page/ManualInputStep";
+import ProgressDisplay from "./page/components/ProgressDisplay";
+import FinalStep from "./page/FinalStep";
+import {
+  computeProgress,
+  mergeExtractedAndManualData,
+  exportExcel,
+} from "./services/formService";
+
+export type ExtractedData = Record<string, string>[];
+
+const App: React.FC = () => {
+  const [step, setStep] = useState<number>(1);
+  const [extractedData, setExtractedData] = useState<ExtractedData>([]);
+  const [missingFields, setMissingFields] = useState<{ rowIndex: number; field: string }[]>([]);
+  const [manualData, setManualData] = useState<Record<number, Record<string, string>>>({});
+
+  const progress = computeProgress(extractedData, manualData, missingFields);
+
+  const handleExtractionComplete = (extracted: ExtractedData, missing: { rowIndex: number; field: string }[]) => {
+    setExtractedData(extracted);
+    setMissingFields(missing);
+    setStep(2);
+  };
+
+  const handleInputChange = (rowIndex: number, field: string, value: string) => {
+    setManualData(prev => ({
+      ...prev,
+      [rowIndex]: {
+        ...prev[rowIndex],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleManualSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const newExtractedData = mergeExtractedAndManualData(extractedData, manualData, missingFields);
+    setExtractedData(newExtractedData);
+    setStep(3);
+  };
+
+  const handleExportExcel = () => {
+    exportExcel(mergeExtractedAndManualData(extractedData, manualData, missingFields));
+  };
+
+  const handlePreviousFromManual = () => setStep(1);
+  const handlePreviousFromFinal = () => setStep(2);
+  const handleRestart = () => {
+    setStep(1);
+    setExtractedData([]);
+    setMissingFields([]);
+    setManualData({});
+  };
+
+  const steps = ["上傳 PDF", "補全欄位", "匯出報告"];
+
+  return (
+    <TamaguiProvider config={config}>
+      <XStack w="100vw" h="100vh">
+        {/* Sidebar */}
+        <YStack w={200} p="$4" backgroundColor="$gray2" gap="$3" borderRightWidth={1} borderColor="$gray7">
+          <Text fontWeight="bold" fontSize={18} mb="$2">流程導覽</Text>
+          {steps.map((label, index) => (
+            <Text
+              key={index}
+              color={step === index + 1 ? "$green10" : "$gray10"}
+              fontWeight={step === index + 1 ? "bold" : "normal"}
+            >
+              {index + 1}. {label}
+            </Text>
+          ))}
+        </YStack>
+
+        {/* Main content */}
+        <YStack flex={1} p="$5" overflow="auto">
+          <ProgressDisplay progress={progress} />
+          <Separator my="$3" />
+          {step === 1 && <UploadStep onExtractionComplete={handleExtractionComplete} />}
+          {step === 2 && (
+            <ManualInputStep
+              missingFieldsPerRow={missingFields}
+              manualData={manualData}
+              onInputChange={handleInputChange}
+              onSubmit={handleManualSubmit}
+              onPrevious={handlePreviousFromManual}
+            />
+          )}
+          {step === 3 && (
+            <FinalStep
+              onExport={handleExportExcel}
+              onRestart={handleRestart}
+              onPrevious={handlePreviousFromFinal}
+              extractedData={extractedData}
+            />
+          )}
+        </YStack>
+      </XStack>
     </TamaguiProvider>
   );
 };
