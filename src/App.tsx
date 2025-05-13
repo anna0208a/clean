@@ -132,13 +132,14 @@ const handleInputChange = (rowIndex: number, field: string, value: string) => {
 
 export default App; */
 import React, { useState } from "react";
-import { TamaguiProvider, XStack, YStack, Text, Separator } from "tamagui";
+import { TamaguiProvider } from "@tamagui/core";
 import config from "./tamagui.config";
 import "./App.css";
+import { YStack, XStack, Button, Text, ScrollView, Separator } from "tamagui";
 import UploadStep from "./page/UploadStep";
 import ManualInputStep from "./page/ManualInputStep";
-import ProgressDisplay from "./page/components/ProgressDisplay";
 import FinalStep from "./page/FinalStep";
+import ProgressDisplay from "./page/components/ProgressDisplay";
 import {
   computeProgress,
   mergeExtractedAndManualData,
@@ -155,7 +156,10 @@ const App: React.FC = () => {
 
   const progress = computeProgress(extractedData, manualData, missingFields);
 
-  const handleExtractionComplete = (extracted: ExtractedData, missing: { rowIndex: number; field: string }[]) => {
+  const handleExtractionComplete = (
+    extracted: ExtractedData,
+    missing: { rowIndex: number; field: string }[]
+  ) => {
     setExtractedData(extracted);
     setMissingFields(missing);
     setStep(2);
@@ -166,14 +170,18 @@ const App: React.FC = () => {
       ...prev,
       [rowIndex]: {
         ...prev[rowIndex],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const handleManualSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newExtractedData = mergeExtractedAndManualData(extractedData, manualData, missingFields);
+    const newExtractedData = mergeExtractedAndManualData(
+      extractedData,
+      manualData,
+      missingFields
+    );
     setExtractedData(newExtractedData);
     setStep(3);
   };
@@ -191,18 +199,27 @@ const App: React.FC = () => {
     setManualData({});
   };
 
-  const steps = ["上傳 PDF", "補全欄位", "匯出報告"];
+  const steps = ["上傳PDF", "補全欄位", "匯出下載"];
 
   return (
     <TamaguiProvider config={config}>
       <XStack w="100vw" h="100vh">
         {/* Sidebar */}
-        <YStack w={200} p="$4" backgroundColor="$gray2" gap="$3" borderRightWidth={1} borderColor="$gray7">
-          <Text fontWeight="bold" fontSize={18} mb="$2">流程導覽</Text>
+        <YStack
+          bg="#e6f2e6"
+          w={180}
+          p="$4"
+          borderRightWidth={1}
+          borderColor="gray"
+          gap="$4"
+        >
+          <Text fontWeight="bold" fontSize="$6" color="#1e5631">
+            🌱 碳足跡助手
+          </Text>
           {steps.map((label, index) => (
             <Text
-              key={index}
-              color={step === index + 1 ? "$green10" : "$gray10"}
+              key={label}
+              color={step === index + 1 ? "#1e5631" : "gray"}
               fontWeight={step === index + 1 ? "bold" : "normal"}
             >
               {index + 1}. {label}
@@ -210,10 +227,17 @@ const App: React.FC = () => {
           ))}
         </YStack>
 
-        {/* Main content */}
-        <YStack flex={1} p="$5" overflow="auto">
+        {/* Main Content */}
+        <YStack
+          flex={1}
+          padding="$6"
+          bg="#f9fdf9"
+          overflow="auto"
+          alignItems="center"
+        >
           <ProgressDisplay progress={progress} />
-          <Separator my="$3" />
+          <Separator my="$4" />
+
           {step === 1 && <UploadStep onExtractionComplete={handleExtractionComplete} />}
           {step === 2 && (
             <ManualInputStep
@@ -239,3 +263,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
