@@ -22,7 +22,7 @@ app.use(cors({
 }));
 
 
-app.post('/api/analyze', upload.single('pdf'), async (req, res) => {
+app.post('/api/analyze', upload.single('pdf'), async (req, res) => { 
   try {
     const filePath = req.file.path;
     console.log("收到 PDF 檔案路徑：", filePath);
@@ -61,6 +61,7 @@ app.post('/api/analyze', upload.single('pdf'), async (req, res) => {
     res.status(500).json({ error: '分析失敗' });
   }
 });
+
 app.post('/api/export', async (req, res) => {
   try {
     const data = req.body.data; // 前端送來的資料
